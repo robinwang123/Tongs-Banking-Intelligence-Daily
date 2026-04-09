@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tongs Banking Intelligence Daily</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+:root{
+  --r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:20px;--r-full:9999px;
+  --font:-apple-system,'SF Pro Text','Helvetica Neue',sans-serif;
+  --font-d:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;
+  --ease:cubic-bezier(.25,.46,.45,.94);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+}
+[data-theme="dark"]{
+  --bg:#05080f;--bg2:#0d1420;--bg3:#131d2e;--bg4:#1a2640;
+  --glass:rgba(13,20,32,.85);
+  --fill1:rgba(100,120,160,.3);--fill2:rgba(100,120,160,.15);--fill3:rgba(100,120,160,.08);
+  --t1:#e8ecf4;--t2:rgba(200,210,230,.65);--t3:rgba(180,195,220,.35);
+  --sep:rgba(80,110,160,.3);
+  --accent:#2d7dd2;--accent-h:#4a94e8;--accent-bg:rgba(45,125,210,.14);
+  --gold:#c9a84c;--gold-bg:rgba(201,168,76,.12);
+  --green:#2ecc71;--red:#e74c3c;
+  --ai-bg:rgba(45,125,210,.08);--ai-border:rgba(45,125,210,.3);
+  --sh-sm:0 1px 4px rgba(0,0,0,.6);--sh-md:0 4px 20px rgba(0,0,0,.7);
+}
+[data-theme="light"]{
+  --bg:#f0f4f9;--bg2:#ffffff;--bg3:#f0f4f9;--bg4:#e4eaf2;
+  --glass:rgba(255,255,255,.82);
+  --fill1:rgba(40,80,140,.12);--fill2:rgba(40,80,140,.07);--fill3:rgba(40,80,140,.04);
+  --t1:#0a1628;--t2:rgba(20,50,100,.65);--t3:rgba(20,50,100,.38);
+  --sep:rgba(40,80,140,.14);
+  --accent:#1a5fa8;--accent-h:#2475c8;--accent-bg:rgba(26,95,168,.08);
+  --gold:#9a7420;--gold-bg:rgba(154,116,32,.08);
+  --green:#27ae60;--red:#c0392b;
+  --ai-bg:rgba(26,95,168,.05);--ai-border:rgba(26,95,168,.2);
+  --sh-sm:0 1px 3px rgba(0,0,0,.08);--sh-md:0 4px 16px rgba(0,0,0,.10);
+}
+body{font-family:var(--font);background:var(--bg);color:var(--t1);-webkit-font-smoothing:antialiased;min-height:100vh;transition:background .3s var(--ease),color .3s var(--ease)}
+
+/* ── Navbar ── */
+.navbar{
+  position:sticky;top:0;z-index:100;height:52px;
+  backdrop-filter:saturate(180%) blur(24px);-webkit-backdrop-filter:saturate(180%) blur(24px);
+  background:var(--glass);border-bottom:.5px solid var(--sep);
+  display:flex;align-items:center;justify-content:space-between;padding:0 20px;
+  transition:background .3s var(--ease);
+}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-icon{width:30px;height:30px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.nav-title{font-family:var(--font-d);font-size:15px;font-weight:700;color:var(--t1);letter-spacing:-.3px}
+.nav-title span{color:var(--gold)}
+
+/* Nav right — language + theme together */
+.nav-right{display:flex;align-items:center;gap:8px}
+
+/* Language segmented in navbar */
+.nav-lang{display:flex;background:var(--fill2);border-radius:var(--r-sm);padding:2px;gap:2px}
+.nav-lang-btn{
+  padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;
+  border:none;background:transparent;color:var(--t3);cursor:pointer;
+  transition:all .15s var(--ease);letter-spacing:.02em;
+}
+.nav-lang-btn.on{background:var(--bg2);color:var(--t1);box-shadow:var(--sh-sm)}
+
+/* Theme toggle */
+.theme-toggle{
+  width:46px;height:26px;border-radius:var(--r-full);background:var(--fill1);
+  border:none;cursor:pointer;position:relative;display:flex;align-items:center;padding:2px;
+  transition:background .3s var(--ease);flex-shrink:0;
+}
+.knob{
+  width:22px;height:22px;border-radius:var(--r-full);background:var(--bg2);
+  box-shadow:var(--sh-sm);transition:transform .3s var(--spring);
+  display:flex;align-items:center;justify-content:center;font-size:11px;
+}
+[data-theme="light"] .knob{transform:translateX(20px)}
+
+/* ── Page ── */
+.page{max-width:1080px;margin:0 auto;padding:20px 20px 60px}
+
+/* ── Hero ── */
+.hero{text-align:center;margin-bottom:24px;padding:20px 0 4px}
+.hero-eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.hero-title{font-family:var(--font-d);font-size:clamp(22px,4vw,36px);font-weight:800;letter-spacing:-.6px;line-height:1.1;color:var(--t1);margin-bottom:8px}
+.hero-title span{color:var(--accent)}
+.hero-sub{font-size:13px;color:var(--t2);line-height:1.5;max-width:500px;margin:0 auto 8px}
+.hero-meta{font-size:11px;color:var(--t3)}
+.hero-meta a{color:var(--accent);text-decoration:none}
+
+/* ── Date + badge row ── */
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.date-badge{font-size:12px;color:var(--t3);display:flex;align-items:center;gap:6px}
+.ai-badge{font-size:10px;font-weight:700;letter-spacing:.06em;padding:3px 10px;border-radius:var(--r-full);background:var(--gold-bg);color:var(--gold);border:.5px solid rgba(201,168,76,.3)}
+
+/* ── Three col ── */
+.three-col{display:grid;grid-template-columns:210px 1px 1fr 1px 200px;gap:0}
+.col{padding:0 18px}.col:first-child{padding-left:0}.col:last-child{padding-right:0}
+.col-div{background:var(--sep)}
+
+/* ── Section labels ── */
+.sec-label{display:flex;align-items:center;gap:7px;margin-bottom:10px}
+.sec-dot{width:5px;height:5px;border-radius:var(--r-full);background:var(--accent);flex-shrink:0}
+.sec-dot.gold{background:var(--gold)}
+.sec-dot.dim{background:var(--t3)}
+.sec-text{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--t2)}
+
+/* ── Cards ── */
+.card{background:var(--bg2);border-radius:var(--r-xl);border:.5px solid var(--sep);box-shadow:var(--sh-sm);padding:16px 18px;margin-bottom:10px;transition:background .3s var(--ease)}
+
+/* AI priority card */
+.ai-card{background:var(--ai-bg);border-color:var(--ai-border);border-radius:var(--r-xl);padding:16px 18px;margin-bottom:10px;border-width:1px}
+.ai-card-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.ai-chip{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:var(--r-full);background:var(--accent-bg);color:var(--accent);border:.5px solid var(--ai-border)}
+.ai-chip-priority{background:var(--gold-bg);color:var(--gold);border-color:rgba(201,168,76,.3)}
+
+/* ── Pills ── */
+.pills{display:flex;flex-wrap:wrap;gap:4px}
+.pill{font-size:11px;padding:3px 9px;border-radius:var(--r-full);background:var(--fill2);color:var(--t2);text-decoration:none;border:.5px solid transparent;transition:all .15s var(--ease);white-space:nowrap}
+.pill:hover{background:var(--accent-bg);color:var(--accent);border-color:var(--ai-border)}
+.pill.gold:hover{background:var(--gold-bg);color:var(--gold)}
+
+/* ── Config ── */
+.cfg-row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px}
+.cfg-group{flex:1;min-width:100px}
+.cfg-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:6px}
+.depth-seg{display:flex;background:var(--fill2);border-radius:var(--r-sm);padding:2px;gap:2px;min-width:0;overflow:hidden;width:100%}
+.depth-btn{flex:1;min-width:0;padding:6px 4px;border-radius:7px;font-size:12px;font-weight:500;border:none;background:transparent;color:var(--t2);cursor:pointer;transition:all .2s var(--ease);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.depth-btn.on{background:var(--bg2);color:var(--t1);box-shadow:var(--sh-sm);font-weight:600}
+
+/* Topic chips row */
+.topic-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.topic-chip{font-size:11px;padding:4px 10px;border-radius:var(--r-full);border:.5px solid var(--sep);background:transparent;color:var(--t2);cursor:pointer;transition:all .15s var(--ease)}
+.topic-chip:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.topic-chip.active{border-color:var(--gold);color:var(--gold);background:var(--gold-bg)}
+
+.topic-input{width:100%;background:var(--fill2);border:.5px solid var(--sep);border-radius:var(--r-md);padding:9px 12px;font-family:var(--font);font-size:13px;color:var(--t1);outline:none;transition:all .2s var(--ease)}
+.topic-input::placeholder{color:var(--t3)}
+.topic-input:focus{border-color:var(--accent);background:var(--bg2);box-shadow:0 0 0 3px var(--accent-bg)}
+
+/* ── Gen button ── */
+.gen-btn{width:100%;padding:12px;border-radius:var(--r-md);border:none;background:linear-gradient(135deg,var(--accent),var(--accent-h));color:#fff;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s var(--ease);display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:-.1px}
+.gen-btn:hover{transform:translateY(-1px);box-shadow:var(--sh-md)}
+.gen-btn:active{transform:none;box-shadow:none}
+.gen-btn:disabled{opacity:.38;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* ── Headlines ── */
+.headline-xl{font-family:var(--font-d);font-size:clamp(18px,2.5vw,26px);font-weight:700;letter-spacing:-.4px;line-height:1.15;color:var(--t1);margin-bottom:7px}
+.byline{font-size:11px;color:var(--t3);margin-bottom:12px}
+.body-text{font-size:13px;line-height:1.65;color:var(--t2)}
+
+/* ── Pullquote ── */
+.pullquote{background:var(--gold-bg);border-left:2px solid var(--gold);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:11px 14px;margin:14px 0}
+.pullquote-text{font-size:13px;font-style:italic;line-height:1.5;color:var(--t1)}
+
+/* ── Side heads ── */
+.side-head{font-family:var(--font-d);font-size:13px;font-weight:600;color:var(--t1);margin-bottom:4px;margin-top:12px}
+.side-head:first-of-type{margin-top:0}
+.rule{border:none;border-top:.5px solid var(--sep);margin:12px 0}
+
+/* ── Progress ── */
+.prog-item{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--t3);padding:4px 0;transition:color .3s}
+.prog-item.active{color:var(--t1)}
+.prog-item.done{color:var(--green)}
+.prog-dot{width:18px;height:18px;border-radius:var(--r-full);background:var(--fill2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;transition:background .2s}
+.prog-item.active .prog-dot{background:var(--accent-bg)}
+.prog-item.done .prog-dot{background:rgba(46,204,113,.15)}
+
+/* ── Output ── */
+.output-wrap{display:none;background:var(--bg2);border-radius:var(--r-xl);border:.5px solid var(--sep);box-shadow:var(--sh-md);overflow:hidden;margin-top:16px}
+.output-bar{background:var(--fill3);padding:10px 16px;border-bottom:.5px solid var(--sep);display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--t3)}
+.out-bar-left{display:flex;align-items:center;gap:7px}
+.live-dot{width:7px;height:7px;border-radius:var(--r-full);background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.output-label{font-size:12px;font-weight:600;color:var(--t1)}
+.output-body{padding:22px;font-size:13px;line-height:1.78;color:var(--t1)}
+.output-body h1,.output-body h2{font-family:var(--font-d);font-weight:700;letter-spacing:-.3px;color:var(--t1);margin:20px 0 7px}
+.output-body h1{font-size:20px}
+.output-body h2{font-size:16px}
+.output-body h3{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);margin:16px 0 4px}
+.output-body p{margin-bottom:11px}
+.output-body a{color:var(--accent);text-decoration:none;border-bottom:.5px solid var(--accent);transition:opacity .15s}
+.output-body a:hover{opacity:.65}
+.output-body strong{font-weight:600;color:var(--t1)}
+.output-body hr{border:none;border-top:.5px solid var(--sep);margin:16px 0}
+.output-body ul{padding-left:16px;margin-bottom:11px}
+.output-body li{margin-bottom:4px}
+
+/* AI section highlight in output */
+.output-body h2:first-of-type{background:var(--ai-bg);border-left:2px solid var(--accent);padding:10px 14px;border-radius:0 var(--r-sm) var(--r-sm) 0;margin-left:-14px}
+
+/* ── Error ── */
+.err-notice{display:none;background:rgba(231,76,60,.1);border:.5px solid rgba(231,76,60,.3);border-radius:var(--r-md);padding:11px 14px;font-size:13px;color:var(--red);margin-top:10px}
+
+/* ── Footer ── */
+.footer{border-top:.5px solid var(--sep);margin-top:40px;padding-top:16px;display:flex;justify-content:space-between;font-size:11px;color:var(--t3);flex-wrap:wrap;gap:6px}
+.footer a{color:var(--t3);text-decoration:none}.footer a:hover{color:var(--accent)}
+
+/* ── Responsive ── */
+@media(max-width:740px){
+  .three-col{grid-template-columns:1fr}
+  .col-div{display:none}
+  .col{padding:0;margin-bottom:20px}
+  .page{padding:14px 14px 50px}
+  .nav-title{font-size:13px}
+  .nav-lang-btn{padding:3px 7px;font-size:10px}
+}
+</style>
+</head>
+<body data-theme="dark">
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="nav-icon">🏦</div>
+    <div class="nav-title">Tongs <span>Banking</span> Intelligence Daily</div>
+  </div>
+  <div class="nav-right">
+    <!-- Language switcher in navbar -->
+    <div class="nav-lang">
+      <button class="nav-lang-btn" onclick="setLang(this,'zh')">中文</button>
+      <button class="nav-lang-btn on" onclick="setLang(this,'en')">EN</button>
+      <button class="nav-lang-btn" onclick="setLang(this,'de')">DE</button>
+    </div>
+    <!-- Theme toggle -->
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+      <div class="knob" id="knob">🌙</div>
+    </button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-eyebrow" id="hero-eyebrow">Global Banking Intelligence</div>
+    <h1 class="hero-title" id="hero-title">Commercial &amp; Product<br><span>Banking Intelligence</span></h1>
+    <p class="hero-sub" id="hero-sub">Tracking the world's top banking analysts, thought leaders, and institutions — with AI × Banking IT as the priority lens.</p>
+    <div class="hero-meta">Powered by <a href="https://anthropic.com" target="_blank">Claude AI</a> · 60 curated sources · Real-time search</div>
+  </div>
+
+  <!-- Date + AI badge -->
+  <div class="top-bar">
+    <div class="date-badge">
+      <span id="date-line"></span>
+    </div>
+    <div class="ai-badge" id="ai-badge">🤖 AI × Banking IT · Priority Section</div>
+  </div>
+
+  <!-- Three columns -->
+  <div class="three-col">
+
+    <!-- LEFT: Sources -->
+    <div class="col">
+      <div class="sec-label">
+        <div class="sec-dot gold"></div>
+        <span class="sec-text" id="lbl-sites">Top Sites</span>
+      </div>
+      <div class="pills">
+        <a class="pill" href="https://thefinancialbrand.com" target="_blank">The Financial Brand</a>
+        <a class="pill" href="https://www.bankingdive.com" target="_blank">Banking Dive</a>
+        <a class="pill" href="https://www.americanbanker.com" target="_blank">American Banker</a>
+        <a class="pill" href="https://www.finextra.com" target="_blank">Finextra</a>
+        <a class="pill" href="https://www.fintechfutures.com" target="_blank">FinTech Futures</a>
+        <a class="pill" href="https://www.mckinsey.com/industries/financial-services" target="_blank">McKinsey FS</a>
+        <a class="pill" href="https://www.deloitte.com/us/en/insights/industry/financial-services" target="_blank">Deloitte Insights</a>
+        <a class="pill" href="https://www.accenture.com/us-en/insights/banking" target="_blank">Accenture Banking</a>
+        <a class="pill" href="https://www.oliverwyman.com/our-expertise/industries/financial-services" target="_blank">Oliver Wyman</a>
+        <a class="pill" href="https://www.bcg.com/industries/financial-institutions" target="_blank">BCG FinInstitutions</a>
+      </div>
+
+      <div class="rule"></div>
+      <div class="sec-label">
+        <div class="sec-dot"></div>
+        <span class="sec-text" id="lbl-blogs">Top Blogs</span>
+      </div>
+      <div class="pills">
+        <a class="pill" href="https://www.fintecttakes.com" target="_blank">Fintech Takes</a>
+        <a class="pill" href="https://thefinanser.com" target="_blank">The Finanser</a>
+        <a class="pill" href="https://tearsheet.co" target="_blank">Tearsheet</a>
+        <a class="pill" href="https://11fs.com/insights" target="_blank">11:FS Insights</a>
+        <a class="pill" href="https://fintechbusinessweekly.substack.com" target="_blank">Fintech Biz Weekly</a>
+        <a class="pill" href="https://thisweekinfintech.com" target="_blank">This Week in Fintech</a>
+        <a class="pill" href="https://www.paymentsdive.com" target="_blank">Payments Dive</a>
+        <a class="pill" href="https://digitalbankingreport.com" target="_blank">Digital Banking Report</a>
+        <a class="pill" href="https://sifted.eu/sector/fintech" target="_blank">Sifted Fintech</a>
+        <a class="pill" href="https://a16z.com/fintech" target="_blank">a16z Fintech</a>
+        <a class="pill" href="https://gfmag.com" target="_blank">Global Finance</a>
+        <a class="pill" href="https://thefr.com" target="_blank">Financial Revolutionist</a>
+      </div>
+
+      <div class="rule"></div>
+      <div class="sec-label">
+        <div class="sec-dot dim"></div>
+        <span class="sec-text" id="lbl-pods">Top Podcasts</span>
+      </div>
+      <div class="pills">
+        <a class="pill gold" href="https://breakingbanks.com" target="_blank">Breaking Banks</a>
+        <a class="pill gold" href="https://11fs.com/podcast" target="_blank">Fintech Insider</a>
+        <a class="pill gold" href="https://www.mckinsey.com/industries/financial-services/our-insights/talking-banking-matters" target="_blank">Talking Banking (McKinsey)</a>
+        <a class="pill gold" href="https://www.jimmarous.com/banking-transformed-podcast" target="_blank">Banking Transformed</a>
+        <a class="pill gold" href="https://fintechrecap.substack.com" target="_blank">Fintech Recap</a>
+        <a class="pill gold" href="https://trovata.io/podcast" target="_blank">Fintech Corner</a>
+        <a class="pill gold" href="https://www.glenbrook.com/payments-on-fire" target="_blank">Payments on Fire</a>
+        <a class="pill gold" href="https://www.joannbarefoot.com/podcast" target="_blank">Barefoot Innovation</a>
+        <a class="pill gold" href="https://openbankingexcellence.org/podcast" target="_blank">Open Banking Podcast</a>
+        <a class="pill gold" href="https://fintechbusinessweekly.substack.com" target="_blank">Fintech Biz Weekly Pod</a>
+      </div>
+    </div>
+
+    <div class="col-div"></div>
+
+    <!-- CENTER: Main -->
+    <div class="col">
+
+      <!-- AI Priority card -->
+      <div class="ai-card">
+        <div class="ai-card-header">
+          <div class="ai-chip" id="ai-chip">🤖 Priority Section</div>
+          <div class="ai-chip ai-chip-priority" id="ai-chip2">AI × Banking IT</div>
+        </div>
+        <div class="body-text" id="ai-desc" style="font-size:12px">
+          Every digest leads with a deep briefing on AI in banking IT — named deployments, architecture shifts, vendor landscape, and the gap between pilots and production.
+        </div>
+      </div>
+
+      <!-- Config card -->
+      <div class="card">
+        <div class="cfg-row">
+          <div class="cfg-group">
+            <span class="cfg-label" id="lbl-depth">Depth</span>
+            <div class="depth-seg">
+              <button class="depth-btn on" onclick="setDepth(this,'standard')" id="d1">Standard</button>
+              <button class="depth-btn" onclick="setDepth(this,'deep')" id="d2">Deep</button>
+              <button class="depth-btn" onclick="setDepth(this,'brief')" id="d3">Brief</button>
+            </div>
+          </div>
+          <div class="cfg-group" style="flex:2">
+            <span class="cfg-label" id="lbl-topic">Focus Topic</span>
+            <input class="topic-input" id="topic" placeholder="e.g. open banking, payments, AI credit…"/>
+          </div>
+        </div>
+        <div class="topic-chips" id="topic-chips">
+          <button class="topic-chip" onclick="setTopic(this,'AI & LLM')">AI & LLM</button>
+          <button class="topic-chip" onclick="setTopic(this,'Payments')">Payments</button>
+          <button class="topic-chip" onclick="setTopic(this,'Open Banking')">Open Banking</button>
+          <button class="topic-chip" onclick="setTopic(this,'Commercial Lending')">Commercial Lending</button>
+          <button class="topic-chip" onclick="setTopic(this,'Treasury Management')">Treasury</button>
+          <button class="topic-chip" onclick="setTopic(this,'Regulation & Compliance')">Regulation</button>
+        </div>
+        <button class="gen-btn" id="btn" onclick="go()">
+          <span>📊</span><span id="btn-text">Generate Banking Intelligence Digest</span>
+        </button>
+        <div class="err-notice" id="err"></div>
+      </div>
+
+      <!-- Intro -->
+      <div class="sec-label">
+        <div class="sec-dot gold"></div>
+        <span class="sec-text" id="lbl-main">Today's Briefing</span>
+      </div>
+      <div class="headline-xl" id="main-head">Commercial &amp; Product Analysis for Banking Professionals</div>
+      <div class="byline" id="main-byline">Generated by Claude AI · 60 curated sources · Serper real-time search</div>
+      <div class="body-text" id="main-body">
+        Click above to generate today's digest. Claude will analyse signals from McKinsey, Deloitte, BCG, Oliver Wyman, The Financial Brand, Banking Dive, and 54 more curated sources — leading with a deep AI × Banking IT briefing, followed by product pulse, business model insights, regulatory radar, and signal vs. noise.
+      </div>
+
+      <div class="pullquote">
+        <div class="pullquote-text" id="pullquote">"The next decade won't belong to the biggest banks — it'll belong to the fastest learners."</div>
+      </div>
+
+      <!-- Progress -->
+      <div id="progress-area" style="display:none;margin-top:12px">
+        <div id="prog-list"></div>
+      </div>
+
+      <!-- Output -->
+      <div class="output-wrap" id="output-area">
+        <div class="output-bar">
+          <div class="out-bar-left">
+            <div class="live-dot"></div>
+            <span class="output-label" id="out-label">Digest ready</span>
+          </div>
+          <span id="out-meta">Claude · Banking Intelligence</span>
+        </div>
+        <div class="output-body" id="output-body"></div>
+      </div>
+    </div>
+
+    <div class="col-div"></div>
+
+    <!-- RIGHT: About -->
+    <div class="col">
+      <div class="sec-label">
+        <div class="sec-dot dim"></div>
+        <span class="sec-text" id="lbl-what">About</span>
+      </div>
+
+      <div class="side-head" id="side-h1">AI × Banking IT First</div>
+      <div class="body-text" style="font-size:12px;margin-bottom:10px" id="side-b1">
+        Every digest leads with a priority deep-dive into AI and IT developments in banking — named deployments, architecture decisions, vendor wins, and the distance between pilots and production.
+      </div>
+
+      <div class="rule"></div>
+      <div class="side-head" id="side-h2">60 Curated Sources</div>
+      <div class="body-text" style="font-size:12px;margin-bottom:10px" id="side-b2">
+        10 top sites (McKinsey, Deloitte, BCG, Oliver Wyman…), 20 leading blogs, 30 podcasts — all focused on commercial banking and product analysis.
+      </div>
+
+      <div class="rule"></div>
+      <div class="side-head" id="side-h3">6 Analysis Dimensions</div>
+      <div class="body-text" style="font-size:12px;margin-bottom:10px" id="side-b3">
+        AI × IT · Product Pulse · Business Models · Regulatory Radar · Today's Reads · Signal vs. Noise — structured for analysts, not general readers.
+      </div>
+
+      <div class="rule"></div>
+      <div class="side-head" id="side-h4">Real Source Links</div>
+      <div class="body-text" style="font-size:12px" id="side-b4">
+        Serper API provides verified, real-time article URLs. Every claim cites a clickable source. No fabricated links.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <span>60 sources curated for banking commercial &amp; product analysis</span>
+    <span>Powered by <a href="https://anthropic.com" target="_blank">Claude AI</a> + <a href="https://serper.dev" target="_blank">Serper</a></span>
+  </div>
+
+</div>
+
+<script>
+// ── Date ──
+document.getElementById('date-line').textContent =
+  new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+// ── Theme ──
+const saved = localStorage.getItem('banking-theme') || 'dark';
+document.body.setAttribute('data-theme', saved);
+document.getElementById('knob').textContent = saved === 'dark' ? '🌙' : '☀️';
+function toggleTheme() {
+  const isDark = document.body.getAttribute('data-theme') === 'dark';
+  const next = isDark ? 'light' : 'dark';
+  document.body.setAttribute('data-theme', next);
+  document.getElementById('knob').textContent = next === 'dark' ? '🌙' : '☀️';
+  localStorage.setItem('banking-theme', next);
+}
+
+// ── i18n ──
+const T = {
+  en: {
+    eyebrow:'Global Banking Intelligence',
+    title:'Commercial &amp; Product<br><span style="color:var(--accent)">Banking Intelligence</span>',
+    sub:'Tracking the world\'s top banking analysts, thought leaders, and institutions — with AI × Banking IT as the priority lens.',
+    aiBadge:'🤖 AI × Banking IT · Priority Section',
+    aiChip:'🤖 Priority Section', aiChip2:'AI × Banking IT',
+    aiDesc:'Every digest leads with a deep briefing on AI in banking IT — named deployments, architecture shifts, vendor landscape, and the gap between pilots and production.',
+    lbl_sites:'Top Sites', lbl_blogs:'Top Blogs', lbl_pods:'Top Podcasts',
+    lbl_depth:'Depth', lbl_topic:'Focus Topic',
+    d1:'Standard', d2:'Deep', d3:'Brief',
+    lbl_main:'Today\'s Briefing',
+    mainHead:'Commercial &amp; Product Analysis for Banking Professionals',
+    mainByline:'Generated by Claude AI · 60 curated sources · Serper real-time search',
+    mainBody:'Click above to generate today\'s digest. Claude will analyse signals from McKinsey, Deloitte, BCG, Oliver Wyman, The Financial Brand, Banking Dive, and 54 more curated sources — leading with a deep AI × Banking IT briefing, followed by product pulse, business model insights, regulatory radar, and signal vs. noise.',
+    placeholder:'e.g. open banking, payments, AI credit…',
+    btn:'Generate Banking Intelligence Digest',
+    pullquote:'"The next decade won\'t belong to the biggest banks — it\'ll belong to the fastest learners."',
+    lbl_what:'About',
+    side_h1:'AI × Banking IT First', side_b1:'Every digest leads with a priority deep-dive into AI and IT developments in banking — named deployments, architecture decisions, vendor wins, and the distance between pilots and production.',
+    side_h2:'60 Curated Sources',    side_b2:'10 top sites (McKinsey, Deloitte, BCG, Oliver Wyman…), 20 leading blogs, 30 podcasts — all focused on commercial banking and product analysis.',
+    side_h3:'6 Analysis Dimensions', side_b3:'AI × IT · Product Pulse · Business Models · Regulatory Radar · Today\'s Reads · Signal vs. Noise — structured for analysts, not general readers.',
+    side_h4:'Real Source Links',     side_b4:'Serper API provides verified, real-time article URLs. Every claim cites a clickable source. No fabricated links.',
+    generated:'Digest ready',
+    chips:['AI & LLM','Payments','Open Banking','Commercial Lending','Treasury','Regulation'],
+    steps:['Connecting to Claude API…','Running real-time search (Serper)…','Analysing AI × Banking IT signals…','Processing product & business news…','Compiling regulatory radar…','Writing digest…'],
+  },
+  zh: {
+    eyebrow:'全球银行业智能简报',
+    title:'商业与产品分析<br><span style="color:var(--accent)">银行业每日简报</span>',
+    sub:'追踪全球顶级银行业分析师、思想领袖和机构动态 — 以 AI × 银行 IT 为优先视角。',
+    aiBadge:'🤖 AI × 银行 IT · 优先专版',
+    aiChip:'🤖 优先专版', aiChip2:'AI × 银行 IT',
+    aiDesc:'每份简报以银行 IT 中的 AI 应用深度简报开篇 — 涵盖具名部署案例、架构变化、供应商格局，以及试点与生产落地之间的差距。',
+    lbl_sites:'头部网站', lbl_blogs:'头部博客', lbl_pods:'头部播客',
+    lbl_depth:'深度', lbl_topic:'聚焦话题',
+    d1:'标准', d2:'深度', d3:'精简',
+    lbl_main:'今日简报',
+    mainHead:'面向银行业从业者的商业与产品分析',
+    mainByline:'由 Claude AI 实时生成 · 60 个精选信源 · Serper 实时搜索',
+    mainBody:'点击上方按钮生成今日简报。Claude 将分析来自麦肯锡、德勤、BCG、奥纬咨询、The Financial Brand、Banking Dive 等 60 个精选信源的信号 — 以 AI × 银行 IT 深度简报开篇，随后是产品动态、商业模式洞察、监管雷达和信号与噪音。',
+    placeholder:'如：开放银行、支付创新、AI 信贷…',
+    btn:'生成银行业情报简报',
+    pullquote:'"下一个十年不属于最大的银行，而属于学习最快的银行。"',
+    lbl_what:'关于本简报',
+    side_h1:'AI × 银行 IT 优先', side_b1:'每份简报以银行 IT 中的 AI 应用深度简报开篇 — 具名部署案例、架构决策、供应商格局，以及试点与生产落地之间的距离。',
+    side_h2:'60 个精选信源',   side_b2:'10 个头部网站（麦肯锡、德勤、BCG、奥纬…）、20 个领先博客、30 个播客 — 全部聚焦商业银行与产品分析。',
+    side_h3:'6 个分析维度',    side_b3:'AI × IT · 产品动态 · 商业模式 · 监管雷达 · 今日精读 · 信号与噪音 — 为分析师设计，而非泛读者。',
+    side_h4:'真实信源链接',    side_b4:'Serper API 提供经验证的实时文章链接。每条观点均附可点击信源。无虚构链接。',
+    generated:'简报已生成',
+    chips:['AI & LLM','支付','开放银行','商业贷款','财资管理','监管合规'],
+    steps:['连接 Claude API…','Serper 实时搜索…','分析 AI × 银行 IT 信号…','处理产品与商业新闻…','整理监管雷达…','撰写简报…'],
+  },
+  de: {
+    eyebrow:'Globale Banking-Intelligenz',
+    title:'Commercial &amp; Product<br><span style="color:var(--accent)">Banking Intelligence</span>',
+    sub:'Tracking der weltweit führenden Bankanalysten, Vordenker und Institute — mit KI × Banking IT als Prioritätslinse.',
+    aiBadge:'🤖 KI × Banking IT · Priorität',
+    aiChip:'🤖 Priorität', aiChip2:'KI × Banking IT',
+    aiDesc:'Jeder Digest beginnt mit einem tiefen Briefing zu KI im Banking IT — benannte Deployments, Architekturänderungen, Vendor-Landschaft und die Lücke zwischen Piloten und Produktion.',
+    lbl_sites:'Top-Websites', lbl_blogs:'Top-Blogs', lbl_pods:'Top-Podcasts',
+    lbl_depth:'Tiefe', lbl_topic:'Fokusthema',
+    d1:'Standard', d2:'Tiefgang', d3:'Kurz',
+    lbl_main:'Heutiges Briefing',
+    mainHead:'Commercial &amp; Produktanalyse für Banking-Profis',
+    mainByline:'Generiert von Claude AI · 60 kuratierte Quellen · Serper Echtzeit-Suche',
+    mainBody:'Klicken Sie oben, um den heutigen Digest zu generieren. Claude analysiert Signale von McKinsey, Deloitte, BCG, Oliver Wyman, The Financial Brand, Banking Dive und 54 weiteren kuratierten Quellen — beginnend mit einem tiefen KI × Banking IT Briefing.',
+    placeholder:'z.B. Open Banking, Zahlungen, KI-Kredit…',
+    btn:'Banking Intelligence Digest generieren',
+    pullquote:'"Das nächste Jahrzehnt gehört nicht den größten Banken — sondern den schnellsten Lernern."',
+    lbl_what:'Über diesen Digest',
+    side_h1:'KI × Banking IT zuerst', side_b1:'Jeder Digest beginnt mit einem tiefen Einblick in KI und IT-Entwicklungen im Banking — benannte Deployments, Architekturentscheidungen, Vendor-Gewinne.',
+    side_h2:'60 kuratierte Quellen',  side_b2:'10 Top-Websites (McKinsey, Deloitte, BCG, Oliver Wyman…), 20 führende Blogs, 30 Podcasts — alle auf Commercial Banking fokussiert.',
+    side_h3:'6 Analysedimensionen',   side_b3:'KI × IT · Produkt-Pulse · Geschäftsmodelle · Regulatorik · Lektüre · Signal vs. Rauschen — für Analysten konzipiert.',
+    side_h4:'Echte Quellenlinks',     side_b4:'Serper API liefert verifizierte, aktuelle Artikel-URLs. Jede Aussage zitiert eine klickbare Quelle. Keine erfundenen Links.',
+    generated:'Digest bereit',
+    chips:['KI & LLM','Zahlungen','Open Banking','Gewerbekredit','Treasury','Regulierung'],
+    steps:['Claude API verbinden…','Echtzeit-Suche (Serper)…','KI × Banking IT analysieren…','Produkt- und Branchennews verarbeiten…','Regulatorik zusammenstellen…','Digest schreiben…'],
+  }
+};
+
+let lang = 'en', depth = 'standard', activeTopic = '';
+
+function setLang(el, l) {
+  document.querySelectorAll('.nav-lang-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  lang = l;
+  const t = T[l];
+  document.getElementById('hero-eyebrow').textContent = t.eyebrow;
+  document.getElementById('hero-title').innerHTML = t.title;
+  document.getElementById('hero-sub').textContent = t.sub;
+  document.getElementById('ai-badge').textContent = t.aiBadge;
+  document.getElementById('ai-chip').textContent = t.aiChip;
+  document.getElementById('ai-chip2').textContent = t.aiChip2;
+  document.getElementById('ai-desc').textContent = t.aiDesc;
+  document.getElementById('lbl-sites').textContent = t.lbl_sites;
+  document.getElementById('lbl-blogs').textContent = t.lbl_blogs;
+  document.getElementById('lbl-pods').textContent = t.lbl_pods;
+  document.getElementById('lbl-depth').textContent = t.lbl_depth;
+  document.getElementById('lbl-topic').textContent = t.lbl_topic;
+  document.getElementById('d1').textContent = t.d1;
+  document.getElementById('d2').textContent = t.d2;
+  document.getElementById('d3').textContent = t.d3;
+  document.getElementById('lbl-main').textContent = t.lbl_main;
+  document.getElementById('main-head').innerHTML = t.mainHead;
+  document.getElementById('main-byline').textContent = t.mainByline;
+  document.getElementById('main-body').textContent = t.mainBody;
+  document.getElementById('topic').placeholder = t.placeholder;
+  document.getElementById('btn-text').textContent = t.btn;
+  document.getElementById('pullquote').textContent = t.pullquote;
+  document.getElementById('lbl-what').textContent = t.lbl_what;
+  document.getElementById('side-h1').textContent = t.side_h1;
+  document.getElementById('side-b1').textContent = t.side_b1;
+  document.getElementById('side-h2').textContent = t.side_h2;
+  document.getElementById('side-b2').textContent = t.side_b2;
+  document.getElementById('side-h3').textContent = t.side_h3;
+  document.getElementById('side-b3').textContent = t.side_b3;
+  document.getElementById('side-h4').textContent = t.side_h4;
+  document.getElementById('side-b4').textContent = t.side_b4;
+  // Update topic chips
+  const chips = document.querySelectorAll('.topic-chip');
+  t.chips.forEach((label, i) => { if (chips[i]) chips[i].textContent = label; });
+  document.documentElement.lang = l === 'zh' ? 'zh' : l === 'de' ? 'de' : 'en';
+  const outArea = document.getElementById('output-area');
+  if (outArea.style.display !== 'none') go();
+}
+
+function setDepth(el, d) {
+  document.querySelectorAll('.depth-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  depth = d;
+}
+
+function setTopic(el, t) {
+  if (el.classList.contains('active')) {
+    el.classList.remove('active');
+    activeTopic = '';
+    document.getElementById('topic').value = '';
+  } else {
+    document.querySelectorAll('.topic-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    activeTopic = t;
+    document.getElementById('topic').value = t;
+  }
+}
+
+function md(text) {
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+    .replace(/^# (.+)$/gm,'<h1>$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/^---$/gm,'<hr>')
+    .replace(/^[\*\-] (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>[\s\S]*?<\/li>\n?)+/g,'<ul>$&</ul>')
+    .split('\n\n').map(p => {
+      p = p.trim(); if (!p) return '';
+      if (/^<(h[1-3]|ul|ol|hr)/.test(p)) return p;
+      return '<p>' + p.replace(/\n/g,'<br>') + '</p>';
+    }).join('\n');
+}
+
+async function go() {
+  const btn = document.getElementById('btn');
+  const progArea = document.getElementById('progress-area');
+  const progList = document.getElementById('prog-list');
+  const outArea = document.getElementById('output-area');
+  const errEl = document.getElementById('err');
+  const mainBody = document.getElementById('main-body');
+  const topic = document.getElementById('topic').value.trim();
+  const t = T[lang];
+
+  btn.disabled = true;
+  document.getElementById('btn-text').textContent = '…';
+  progArea.style.display = 'block';
+  outArea.style.display = 'none';
+  errEl.style.display = 'none';
+  progList.innerHTML = '';
+  mainBody.style.opacity = '0.3';
+
+  for (let i = 0; i < t.steps.length; i++) {
+    await new Promise(r => setTimeout(r, i === 0 ? 60 : 600));
+    const row = document.createElement('div');
+    row.className = 'prog-item active';
+    row.innerHTML = `<div class="prog-dot">⏳</div><span>${t.steps[i]}</span>`;
+    progList.appendChild(row);
+    if (i > 0) {
+      const prev = progList.children[i-1];
+      prev.className = 'prog-item done';
+      prev.querySelector('.prog-dot').textContent = '✓';
+    }
+  }
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lang, depth, topic })
+    });
+    const data = await res.json();
+    progList.lastChild.className = 'prog-item done';
+    progList.lastChild.querySelector('.prog-dot').textContent = '✓';
+    progArea.style.display = 'none';
+    mainBody.style.opacity = '1';
+
+    if (data.error) {
+      errEl.textContent = 'Error: ' + data.error;
+      errEl.style.display = 'block';
+    } else {
+      document.getElementById('out-label').textContent = t.generated;
+      document.getElementById('out-meta').textContent = `Claude · ${new Date().toLocaleDateString()}`;
+      document.getElementById('output-body').innerHTML = md(data.result);
+      outArea.style.display = 'block';
+      outArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  } catch (e) {
+    progArea.style.display = 'none';
+    mainBody.style.opacity = '1';
+    errEl.textContent = 'Network error: ' + e.message;
+    errEl.style.display = 'block';
+  }
+
+  btn.disabled = false;
+  document.getElementById('btn-text').textContent = T[lang].btn;
+}
+</script>
+</body>
+</html>
