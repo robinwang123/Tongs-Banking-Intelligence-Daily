@@ -3,7 +3,7 @@ import { generateDigest } from './_digest.js';
 import { buildEmailHtml, buildSubject } from './_email.js';
 
 const DEFAULT_TO   = 'xiaotong.xu@gmx.de';
-const DEFAULT_FROM = 'Tongs Banking Intelligence Daily <onboarding@resend.dev>';
+const DEFAULT_FROM = 'Tongs Banking Intelligence Daily <TongsKIDaily@amongthelight.com>';
 
 export default async function handler(req, res) {
   if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
