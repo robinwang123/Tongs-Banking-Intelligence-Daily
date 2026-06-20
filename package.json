@@ -1,24 +1,5 @@
 {
-  "name": "tongs-banking-intelligence-daily",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/robinwang123/Tongs-Banking-Intelligence-Daily.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/robinwang123/Tongs-Banking-Intelligence-Daily/issues"
-  },
-  "homepage": "https://github.com/robinwang123/Tongs-Banking-Intelligence-Daily#readme",
   "dependencies": {
     "marked": "^18.0.5"
-  },
-  "type": "module"
+  }
 }
