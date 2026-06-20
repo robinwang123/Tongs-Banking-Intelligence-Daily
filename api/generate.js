@@ -13,6 +13,7 @@ export default async function handler(req, res) {
     const { text } = await generateDigest({ lang, depth, topic });
     return res.status(200).json({ result: text });
   } catch (err) {
+    console.error('[generate] Failed:', err.message);
     return res.status(500).json({ error: err.message });
   }
 }
