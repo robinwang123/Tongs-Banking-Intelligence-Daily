@@ -1,24 +1,5 @@
 // Converts markdown digest text into a fully styled HTML email
 // Preserves all hyperlinks and source citations
-import { marked } from 'marked';
-
-// Configure marked for email-safe output
-marked.setOptions({ breaks: true, gfm: true });
-
-// Custom renderer to strip raw HTML blocks from markdown input (XSS prevention)
-const renderer = new marked.Renderer();
-renderer.html = function() { return ''; };  // strip all raw HTML blocks
-marked.use({ renderer });
-
-// Post-sanitize: strip dangerous URLs (javascript:, data:, vbscript:)
-function sanitizeHtml(html) {
-  return html
-    // Strip javascript:/data:/vbscript: URLs in href/src attributes
-    .replace(/(href|src)\s*=\s*["']?\s*(javascript|data|vbscript)\s*:/gi, '$1=""')
-    // Strip any remaining event handler attributes
-    .replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi, '')
-    .replace(/\s*on\w+\s*=\s*\S+/gi, '');
-}
 
 export function buildSubject({ depth, lang }) {
   const today = new Date().toLocaleDateString('en-GB', {
@@ -30,29 +11,14 @@ export function buildSubject({ depth, lang }) {
   return `${prefixes[lang] || 'Banking Intelligence'} · ${today} · ${cap}`;
 }
 
-// Post-process marked output to inject email-safe inline styles
-function styleHtml(html) {
-  return html
-    .replace(/<h3>/g, '<h3 style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#5a7a9a;margin:18px 0 5px">')
-    .replace(/<h2>/g, '<h2 style="font-size:17px;font-weight:700;color:#0B2E4E;margin:22px 0 8px;padding-bottom:8px;border-bottom:1.5px solid #eef2f7">')
-    .replace(/<h1>/g, '<h1 style="font-size:17px;font-weight:700;color:#0B2E4E;margin:22px 0 8px;border-left:3px solid #1a5fa8;padding:12px 14px;border-radius:0 8px 8px 0;border-bottom:none;margin-left:-14px">')
-    .replace(/<strong>/g, '<strong style="font-weight:600;color:#0B2E4E">')
-    .replace(/<a /g, '<a style="color:#1a5fa8;text-decoration:none;border-bottom:1px solid rgba(26,95,168,.3)" ')
-    .replace(/<ul>/g, '<ul style="padding-left:18px;margin-bottom:12px">')
-    .replace(/<ol>/g, '<ol style="padding-left:18px;margin-bottom:12px">')
-    .replace(/<li>/g, '<li style="font-size:14px;line-height:1.7;color:#1a2535;margin-bottom:5px">')
-    .replace(/<p>/g, '<p style="font-size:14px;line-height:1.75;color:#1a2535;margin-bottom:12px">')
-    .replace(/<hr\s*\/?>/g, '<hr style="border:none;border-top:1px solid #eef2f7;margin:20px 0">');
-}
-
 export function buildEmailHtml({ text, depth, lang }) {
   const depthLabel = { standard: 'Standard', deep: 'Deep Dive', brief: 'Brief' }[depth] || 'Standard';
   const today = new Date().toLocaleDateString('en-GB', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   });
 
-  // marked renders markdown, sanitizeHtml strips any XSS vectors
-  const body = sanitizeHtml(styleHtml(marked.parse(text)));
+  // Convert markdown to HTML (hyperlinks, bold, headers, lists, hr)
+  const body = mdToHtml(text);
 
   return `<!DOCTYPE html>
 <html lang="${lang === 'zh' ? 'zh' : lang === 'de' ? 'de' : 'en'}">
@@ -83,7 +49,7 @@ export function buildEmailHtml({ text, depth, lang }) {
   .content p{font-size:14px;line-height:1.75;color:#1a2535 !important;margin-bottom:12px}
   .content a{color:#1a5fa8 !important;text-decoration:none;border-bottom:1px solid rgba(26,95,168,.3)}
   .content strong{font-weight:600;color:#0B2E4E !important}
-  .content ul,.content ol{padding-left:18px;margin-bottom:12px}
+  .content ul{padding-left:18px;margin-bottom:12px}
   .content li{font-size:14px;line-height:1.7;color:#1a2535 !important;margin-bottom:5px}
   .content hr{border:none;border-top:1px solid #eef2f7;margin:20px 0}
   .footer{margin-top:16px;padding:0 4px;background:#f0f4f9 !important}
@@ -123,7 +89,7 @@ export function buildEmailHtml({ text, depth, lang }) {
     <div class="content" style="padding:28px 32px;background:#ffffff;color:#1a2535">
       ${body}
       <div class="source-bar" style="background:#f0f5fa !important;border-radius:10px;padding:12px 16px;margin-top:20px;border:1px solid #d8e3ee">
-        <p style="font-size:11px;color:#6a7f96 !important;margin:0;line-height:1.6">75 curated sources · McKinsey · Deloitte · BCG · Oliver Wyman · The Financial Brand · Banking Dive · American Banker · Finextra · FinTech Futures · Accenture Banking · Nikkei Asia · SCMP and 65 more</p>
+        <p style="font-size:11px;color:#6a7f96 !important;margin:0;line-height:1.6">60 curated sources · McKinsey · Deloitte · BCG · Oliver Wyman · The Financial Brand · Banking Dive · American Banker · Finextra · FinTech Futures · Accenture Banking and 50 more</p>
       </div>
     </div>
   </div>
@@ -136,4 +102,32 @@ export function buildEmailHtml({ text, depth, lang }) {
 </div>
 </body>
 </html>`;
+}
+
+function mdToHtml(md) {
+  return md
+    // Escape only <> that aren't already in markdown links
+    .replace(/&(?!amp;|lt;|gt;)/g, '&amp;')
+    // Headers (before bold so ** inside headers works)
+    .replace(/^### (.+)$/gm, '<h3 style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#5a7a9a;margin:18px 0 5px">$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2 style="font-size:17px;font-weight:700;color:#0B2E4E;margin:22px 0 8px;padding-bottom:8px;border-bottom:1.5px solid #eef2f7">$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1 style="font-size:17px;font-weight:700;color:#0B2E4E;margin:22px 0 8px">$1</h1>')
+    // Bold
+    .replace(/\*\*(.+?)\*\*/g, '<strong style="font-weight:600;color:#0B2E4E">$1</strong>')
+    // Links
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color:#1a5fa8;text-decoration:none">$1</a>')
+    // HR
+    .replace(/^---$/gm, '<hr>')
+    // Lists
+    .replace(/^[\*\-] (.+)$/gm, '<li style="font-size:14px;line-height:1.7;color:#1a2535;margin-bottom:5px">$1</li>')
+    .replace(/(<li>[\s\S]*?<\/li>\n?)+/g, '<ul>$&</ul>')
+    // Paragraphs
+    .split('\n\n')
+    .map(p => {
+      p = p.trim();
+      if (!p) return '';
+      if (/^<(h[1-3]|ul|ol|hr)/.test(p)) return p;
+      return '<p style="font-size:14px;line-height:1.75;color:#1a2535;margin-bottom:12px">' + p.replace(/\n/g, '<br>') + '</p>';
+    })
+    .join('\n');
 }
