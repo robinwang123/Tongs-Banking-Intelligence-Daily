@@ -720,8 +720,7 @@ function setLang(el, l) {
   el.classList.add('on');
   lang = l;
   applyLang(l);
-  const out = document.getElementById('output-area');
-  if (out.style.display !== 'none') go();
+  // 切换语言只更新界面文字，不自动重新生成简报（需手动点击生成按钮）
 }
 
 function applyLang(l) {
