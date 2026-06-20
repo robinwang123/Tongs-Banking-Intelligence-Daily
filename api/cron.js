@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorised' });
   }
   try {
-    const lang = 'en', depth = 'standard';
+    const lang = 'de', depth = 'standard';
     const { text } = await generateDigest({ lang, depth, topic: '' });
     const html    = buildEmailHtml({ text, depth, lang });
     const subject = buildSubject({ depth, lang });
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     });
     const data = await r.json();
     if (!r.ok) throw new Error(data.message || 'Resend error');
-    console.log(`[cron] Sent → ${DEFAULT_TO} | id: ${data.id}`);
+    console.log(`[cron] Sent (de) → ${DEFAULT_TO} | id: ${data.id}`);
     return res.status(200).json({ ok: true, id: data.id });
   } catch (err) {
     console.error('[cron] Failed:', err.message);
