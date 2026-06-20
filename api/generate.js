@@ -10,7 +10,8 @@ export default async function handler(req, res) {
   const { lang = 'en', depth = 'standard', topic = '' } = req.body || {};
 
   try {
-    const { text } = await generateDigest({ lang, depth, topic });
+    // Frontend uses fewer searches to stay within Hobby 10s limit
+    const { text } = await generateDigest({ lang, depth, topic, maxSearches: 5 });
     return res.status(200).json({ result: text });
   } catch (err) {
     console.error('[generate] Failed:', err.message);

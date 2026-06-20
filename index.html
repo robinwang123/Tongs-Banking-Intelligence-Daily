@@ -821,7 +821,15 @@ async function go() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ lang, depth, topic }),
     });
-    const data = await res.json();
+
+    let data;
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      data = await res.json();
+    } else {
+      const text = await res.text();
+      throw new Error(res.status === 504 ? 'Timeout — function exceeded time limit. Try again or use "brief" depth.' : `Server error (${res.status}): ${text.slice(0,100)}`);
+    }
     progList.lastChild.className = 'prog-item done';
     progList.lastChild.querySelector('.prog-dot').textContent = '✓';
     progArea.style.display = 'none';
@@ -841,7 +849,7 @@ async function go() {
   } catch (e) {
     progArea.style.display = 'none';
     mainBody.style.opacity = '1';
-    errEl.textContent = 'Network error: ' + e.message;
+    errEl.textContent = e.message;
     errEl.style.display = 'block';
   }
 

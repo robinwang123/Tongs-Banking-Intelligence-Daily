@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/robinwang123/Tongs-Banking-Intelligence-Daily#readme",
   "dependencies": {
-    "isomorphic-dompurify": "^3.18.0",
     "marked": "^18.0.5"
-  }
+  },
+  "type": "module"
 }

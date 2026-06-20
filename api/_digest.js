@@ -185,7 +185,7 @@ async function callClaude(prompt, retries = 2) {
   throw new Error('Claude API failed after retries');
 }
 
-export async function generateDigest({ lang = 'en', depth = 'standard', topic = '' }) {
+export async function generateDigest({ lang = 'en', depth = 'standard', topic = '', maxSearches = 8 }) {
   const SERPER_KEY = process.env.SERPER_API_KEY;
   const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   const lastWeek = getLastWeek();
@@ -213,8 +213,9 @@ export async function generateDigest({ lang = 'en', depth = 'standard', topic = 
       `banking business model strategy M&A partnership 2026`,
     ];
 
-    console.log(`[digest] Running ${queries.length} Serper searches...`);
-    const searches = await Promise.all(queries.map(q => serperSearch(q, SERPER_KEY, 4)));
+    const useQueries = queries.slice(0, maxSearches);
+    console.log(`[digest] Running ${useQueries.length} Serper searches...`);
+    const searches = await Promise.all(useQueries.map(q => serperSearch(q, SERPER_KEY, 4)));
     const flat = searches.flat();
     const seen = new Set();
     searchResults = flat.filter(r => { if (seen.has(r.url)) return false; seen.add(r.url); return true; });
