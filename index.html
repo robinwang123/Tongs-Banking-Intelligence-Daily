@@ -92,7 +92,7 @@ body{font-family:var(--font),var(--font-zh);background:var(--bg);color:var(--t1)
 .cfg-group{flex:1;min-width:90px}
 .cfg-label{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:6px}
 .depth-seg{display:flex;background:var(--fill2);border-radius:var(--r-sm);padding:2px;gap:2px;width:100%}
-.depth-btn{flex:1;min-width:0;padding:6px 4px;border-radius:7px;font-size:12px;font-weight:500;border:none;background:transparent;color:var(--t2);cursor:pointer;transition:all .2s var(--ease);text-align:center}
+.depth-btn{flex:1;min-width:0;padding:6px 4px;border-radius:7px;font-size:12px;font-weight:500;border:none;background:transparent;color:var(--t2);cursor:pointer;transition:all .2s var(--ease);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .depth-btn.on{background:var(--bg2);color:var(--t1);box-shadow:var(--sh-sm);font-weight:600}
 .topic-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
 .topic-chip{font-size:11px;padding:4px 9px;border-radius:var(--r-full);border:.5px solid var(--sep);background:transparent;color:var(--t2);cursor:pointer;transition:all .15s var(--ease)}
@@ -194,6 +194,7 @@ body{font-family:var(--font),var(--font-zh);background:var(--bg);color:var(--t1)
   .mob-collapse-body{overflow:hidden;transition:max-height .3s var(--ease),opacity .25s var(--ease);max-height:0;opacity:0}
   .mob-collapse-body.open{max-height:800px;opacity:1}
   .mob-collapse-body .pills{padding:10px 14px 12px}
+  .depth-btn{font-size:10px;padding:5px 2px}
   /* Hide desktop left col structure on mobile — replaced by collapsibles */
   .left-col-desktop{display:none}
   .left-col-mobile{display:block}
