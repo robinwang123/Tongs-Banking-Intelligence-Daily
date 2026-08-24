@@ -7,10 +7,29 @@ const DEFAULT_FROM = process.env.DAILY_FROM || 'Tongs Banking Intelligence Daily
 const CRON_LANG    = process.env.CRON_LANG || 'de';
 const CRON_DEPTH   = process.env.CRON_DEPTH || 'standard';
 
+const STATE_URL = 'https://raw.githubusercontent.com/robinwang123/Tongs-Banking-Intelligence-Daily/main/data/schedule-state.json';
+
+async function isPaused() {
+  try {
+    const r = await fetch(`${STATE_URL}?t=${Date.now()}`); // bust cache
+    if (!r.ok) return false;
+    const d = await r.json();
+    return !!d.paused;
+  } catch {
+    return false; // fail-safe: if state can't be read, still send
+  }
+}
+
 export default async function handler(req, res) {
   if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
     return res.status(401).json({ error: 'Unauthorised' });
   }
+
+  if (await isPaused()) {
+    console.log('[cron] Scheduled delivery is paused — skipping send.');
+    return res.status(200).json({ ok: true, skipped: true, reason: 'paused' });
+  }
+
   try {
     console.log(`[cron] Starting digest generation (lang=${CRON_LANG}, depth=${CRON_DEPTH})`);
     const { text } = await generateDigest({ lang: CRON_LANG, depth: CRON_DEPTH, topic: '' });
