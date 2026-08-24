@@ -120,6 +120,7 @@ body{font-family:var(--font),var(--font-zh);background:var(--bg);color:var(--t1)
 .toggle-wrap{flex-shrink:0;margin-left:12px}
 .toggle{width:44px;height:26px;border-radius:99px;border:none;cursor:pointer;background:var(--fill1);position:relative;transition:background .25s var(--ease);display:flex;align-items:center;padding:2px}
 .toggle.active{background:#34c759}
+.toggle:disabled{opacity:.55;cursor:not-allowed}
 .toggle-knob{width:22px;height:22px;border-radius:50%;background:var(--bg2);box-shadow:var(--sh-sm);transition:transform .25s var(--spring);flex-shrink:0}
 .toggle.active .toggle-knob{transform:translateX(18px)}
 .fwd-area{margin-top:12px;padding-top:12px;border-top:.5px solid var(--sep)}
@@ -512,13 +513,50 @@ function toggleTheme() {
 let lang = 'en', depth = 'standard', lastDigestText = '';
 let schedActive = true;
 
-// ── Scheduled toggle ──
-function toggleSched() {
-  schedActive = !schedActive;
+// ── Scheduled toggle (persisted server-side via GitHub-backed API) ──
+function updateSchedUI() {
   document.getElementById('sched-toggle').className = 'toggle' + (schedActive ? ' active' : '');
   const t = document.getElementById('sched-time-static');
   if (t) t.style.opacity = schedActive ? '1' : '0.35';
 }
+
+async function loadSchedState() {
+  try {
+    const r = await fetch('/api/toggle-schedule');
+    const d = await r.json();
+    schedActive = !d.paused;
+  } catch (e) {
+    schedActive = true; // fail-open on UI: assume active if state can't be read
+  }
+  updateSchedUI();
+}
+
+async function toggleSched() {
+  const toggleBtn = document.getElementById('sched-toggle');
+  const prev = schedActive;
+  const next = !schedActive;
+  toggleBtn.disabled = true;
+  try {
+    const r = await fetch('/api/toggle-schedule', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paused: !next }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Update failed');
+    schedActive = next;
+  } catch (e) {
+    schedActive = prev; // revert on failure
+    const errEl = document.getElementById('err');
+    errEl.textContent = 'Error: ' + e.message;
+    errEl.style.display = 'block';
+    setTimeout(() => { errEl.style.display = 'none'; }, 4000);
+  }
+  updateSchedUI();
+  toggleBtn.disabled = false;
+}
+
+loadSchedState();
 
 // ── Forward email ──
 let fwdReady = false;
